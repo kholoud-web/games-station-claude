@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "check:contrast": "tsx scripts/check-contrast.ts"
   },
   "dependencies": {
     "next": "16.4.6",
@@ -32,6 +33,7 @@
     "jsdom": "^31.0.1",
     "prettier": "^3.10.1",
     "tailwindcss": "4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^5.1.0"
