@@ -1,0 +1,69 @@
+import type { PersistStorage, StorageValue } from 'zustand/middleware';
+import { z } from 'zod';
+import type { CartItem } from '@/services/types';
+
+export const CART_STORAGE_KEY = 'gs-cart';
+export const CART_SCHEMA_VERSION = 1;
+export const MAX_LINE_QUANTITY = 99;
+
+/** Strips unknown keys (such as a planted `price`) because zod objects drop them by default. */
+const lineSchema = z.object({
+  productId: z.string().min(1),
+  variantId: z.string().min(1),
+  quantity: z.number(),
+});
+
+/** Whole units between 1 and 99, or null when the value cannot be a quantity. */
+export function normalizeQuantity(value: number): number | null {
+  if (!Number.isFinite(value)) return null;
+  const whole = Math.trunc(value);
+  if (whole < 1) return null;
+  return Math.min(whole, MAX_LINE_QUANTITY);
+}
+
+/** Keeps the valid lines of whatever was found in storage and drops everything else. */
+export function sanitizeItems(raw: unknown): CartItem[] {
+  if (!Array.isArray(raw)) return [];
+  const items: CartItem[] = [];
+  for (const entry of raw) {
+    const parsed = lineSchema.safeParse(entry);
+    if (!parsed.success) continue;
+    const quantity = normalizeQuantity(parsed.data.quantity);
+    if (quantity !== null) items.push({ ...parsed.data, quantity });
+  }
+  return items;
+}
+
+type CartPersisted = { items: CartItem[] };
+
+/**
+ * localStorage wrapper that never throws: private mode, blocked storage,
+ * server rendering and corrupted JSON all behave like an empty cart.
+ */
+export const safeCartStorage: PersistStorage<CartPersisted> = {
+  getItem(name) {
+    try {
+      const raw = window.localStorage.getItem(name);
+      if (raw === null) return null;
+      const parsed: unknown = JSON.parse(raw);
+      if (typeof parsed !== 'object' || parsed === null || !('state' in parsed)) return null;
+      return parsed as StorageValue<CartPersisted>;
+    } catch {
+      return null;
+    }
+  },
+  setItem(name, value) {
+    try {
+      window.localStorage.setItem(name, JSON.stringify(value));
+    } catch {
+      // Storage is a convenience; the cart keeps working in memory.
+    }
+  },
+  removeItem(name) {
+    try {
+      window.localStorage.removeItem(name);
+    } catch {
+      // Nothing to clean up when storage is unavailable.
+    }
+  },
+};
