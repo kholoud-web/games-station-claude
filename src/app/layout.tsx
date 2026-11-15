@@ -1,15 +1,6 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { ReactNode } from 'react';
 
-export const metadata: Metadata = {
-  title: "Games Station",
-  description: "Games Station storefront (frontend foundation, mock data only)",
-};
-
-export default function RootLayout({ children }: LayoutProps<"/">) {
-  return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">{children}</body>
-    </html>
-  );
+// The <html> element lives in app/[locale]/layout.tsx so lang and dir follow the URL locale.
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return children;
 }

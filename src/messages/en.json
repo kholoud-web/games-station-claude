@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "title": "Games Station",
+    "description": "Console hardware, controllers, games and gift cards in Egypt."
+  },
+  "common": {
+    "brand": "Games Station",
+    "loading": "Loading",
+    "retry": "Try again",
+    "language": "Language",
+    "demoNotice": "Demo only: simulated data, no real orders or payments."
+  },
+  "nav": {
+    "home": "Home",
+    "shop": "Shop",
+    "categories": "Categories",
+    "giftCards": "Gift cards",
+    "support": "Support"
+  },
+  "a11y": {
+    "skipToContent": "Skip to content"
+  }
+}

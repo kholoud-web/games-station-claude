@@ -58,3 +58,18 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* Locale typography. Arabic: no positive tracking (it breaks letter joining), looser leading. */
+.font-latin {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+.font-arabic {
+  font-family: var(--font-plex-arabic), var(--font-plex-latin), system-ui, sans-serif;
+  letter-spacing: 0;
+  line-height: 1.7;
+}
+
+[dir='rtl'] * {
+  letter-spacing: 0 !important;
+}
