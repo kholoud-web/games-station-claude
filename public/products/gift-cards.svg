@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Gift card placeholder">
+  <defs><radialGradient id="g" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#122640"/><stop offset="1" stop-color="#0A1728"/></radialGradient></defs>
+  <rect width="400" height="400" fill="url(#g)"/>
+  <rect x="110" y="140" width="180" height="120" rx="28" fill="#0D1D32" stroke="#47D6FF" stroke-opacity=".55" stroke-width="3"/>
+  <circle cx="200" cy="200" r="22" fill="#47D6FF" fill-opacity=".85"/>
+</svg>
