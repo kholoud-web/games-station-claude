@@ -19,5 +19,16 @@
   },
   "a11y": {
     "skipToContent": "Skip to content"
+  },
+  "validation": {
+    "required": "This field is required",
+    "emailInvalid": "Enter a valid email address",
+    "phoneInvalid": "Enter an Egyptian mobile number, like 01012345678",
+    "passwordTooShort": "Use at least 8 characters",
+    "passwordTooLong": "Use 128 characters or fewer",
+    "passwordNeedsLetter": "Include at least one letter",
+    "passwordNeedsDigit": "Include at least one number",
+    "tooLong": "This text is too long",
+    "countryUnsupported": "We deliver within Egypt only"
   }
 }

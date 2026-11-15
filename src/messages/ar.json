@@ -19,5 +19,16 @@
   },
   "a11y": {
     "skipToContent": "تخطَّ إلى المحتوى"
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "emailInvalid": "أدخل بريدًا إلكترونيًا صحيحًا",
+    "phoneInvalid": "أدخل رقم موبايل مصري صحيحًا، مثل 01012345678",
+    "passwordTooShort": "استخدم 8 أحرف على الأقل",
+    "passwordTooLong": "استخدم 128 حرفًا أو أقل",
+    "passwordNeedsLetter": "أضف حرفًا واحدًا على الأقل",
+    "passwordNeedsDigit": "أضف رقمًا واحدًا على الأقل",
+    "tooLong": "النص طويل جدًا",
+    "countryUnsupported": "نوصّل داخل مصر فقط"
   }
 }
