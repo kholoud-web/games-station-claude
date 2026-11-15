@@ -30,5 +30,29 @@
     "passwordNeedsDigit": "أضف رقمًا واحدًا على الأقل",
     "tooLong": "النص طويل جدًا",
     "countryUnsupported": "نوصّل داخل مصر فقط"
+  },
+  "stock": {
+    "in_stock": "متوفر",
+    "low_stock": "كمية محدودة",
+    "out_of_stock": "غير متوفر"
+  },
+  "components": {
+    "quantity": {
+      "decrease": "تقليل الكمية",
+      "increase": "زيادة الكمية"
+    },
+    "password": {
+      "show": "إظهار كلمة المرور"
+    },
+    "search": {
+      "label": "بحث"
+    },
+    "price": {
+      "was": "السعر السابق"
+    },
+    "rating": {
+      "none": "لا توجد تقييمات بعد",
+      "summary": "التقييم {rating} من 5 بناءً على {count, plural, zero {لا توجد تقييمات} one {تقييم واحد} two {تقييمان} few {{countText} تقييمات} many {{countText} تقييمًا} other {{countText} تقييم}}"
+    }
   }
 }

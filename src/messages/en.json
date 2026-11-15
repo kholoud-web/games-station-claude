@@ -30,5 +30,29 @@
     "passwordNeedsDigit": "Include at least one number",
     "tooLong": "This text is too long",
     "countryUnsupported": "We deliver within Egypt only"
+  },
+  "stock": {
+    "in_stock": "In stock",
+    "low_stock": "Low stock",
+    "out_of_stock": "Out of stock"
+  },
+  "components": {
+    "quantity": {
+      "decrease": "Decrease quantity",
+      "increase": "Increase quantity"
+    },
+    "password": {
+      "show": "Show password"
+    },
+    "search": {
+      "label": "Search"
+    },
+    "price": {
+      "was": "Was"
+    },
+    "rating": {
+      "none": "No reviews yet",
+      "summary": "Rated {rating} out of 5 from {count, plural, one {{countText} review} other {{countText} reviews}}"
+    }
   }
 }
