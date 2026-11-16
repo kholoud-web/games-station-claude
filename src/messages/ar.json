@@ -53,6 +53,15 @@
     "rating": {
       "none": "لا توجد تقييمات بعد",
       "summary": "التقييم {rating} من 5 بناءً على {count, plural, zero {لا توجد تقييمات} one {تقييم واحد} two {تقييمان} few {{countText} تقييمات} many {{countText} تقييمًا} other {{countText} تقييم}}"
+    },
+    "productCard": {
+      "add": "أضف",
+      "addLabel": "أضف {name} إلى السلة",
+      "added": "تمت إضافة {name} إلى السلة",
+      "wishlist": "احفظ {name} في المفضلة"
+    },
+    "breadcrumb": {
+      "label": "مسار التنقل"
     }
   }
 }

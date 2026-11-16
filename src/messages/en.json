@@ -53,6 +53,15 @@
     "rating": {
       "none": "No reviews yet",
       "summary": "Rated {rating} out of 5 from {count, plural, one {{countText} review} other {{countText} reviews}}"
+    },
+    "productCard": {
+      "add": "Add",
+      "addLabel": "Add {name} to cart",
+      "added": "{name} added to cart",
+      "wishlist": "Save {name} to wishlist"
+    },
+    "breadcrumb": {
+      "label": "Breadcrumb"
     }
   }
 }
