@@ -25,7 +25,7 @@ export function StatusSection() {
         </div>
       </Example>
       <Example label="Price, and price with a previous price">
-        <div className="space-y-3">
+        <div className="flex flex-col items-start gap-3">
           <PriceTag price={money(329900)} />
           <PriceTag price={money(329900)} compareAt={money(399900)} />
         </div>

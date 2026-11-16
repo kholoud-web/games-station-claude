@@ -230,3 +230,34 @@ describe('Mobile navigation', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });
+
+describe('Header collapse point', () => {
+  // At 768px the logo, five links, the search and four actions need about 1,290px, so the language
+  // switcher ended up 68px outside the screen. Tablets get the compact header; the full one starts
+  // at Tailwind's `lg` (1024px).
+  it('shows the full header only from 1024px', () => {
+    const { container } = renderWithIntl(<Header />);
+    const header = container.querySelector('header');
+    const nav = header?.querySelector('nav');
+
+    expect(nav).toHaveClass('hidden', 'lg:block');
+    expect(screen.getByRole('button', { name: 'Open menu' })).toHaveClass('lg:hidden');
+    expect(screen.getByRole('link', { name: 'Wishlist' })).toHaveClass('hidden', 'lg:inline-flex');
+    expect(screen.getByRole('link', { name: 'Account' })).toHaveClass('hidden', 'lg:inline-flex');
+    expect(header?.outerHTML).not.toMatch(/\bmd:/);
+  });
+
+  it('asks the browser for the same 1024px threshold when it closes the menu', () => {
+    const matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+    }));
+    vi.stubGlobal('matchMedia', matchMedia);
+    renderWithIntl(<Header />);
+    act(() => uiStore.getState().setMobileNavOpen(true));
+
+    expect(matchMedia).toHaveBeenCalledWith('(min-width: 1024px)');
+  });
+});

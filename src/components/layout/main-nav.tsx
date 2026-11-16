@@ -8,7 +8,7 @@ import { cn } from '@/lib/cn';
 
 import { MAIN_NAV } from './nav-config';
 
-/** Desktop navigation. Below 768px the same links live in MobileNav. */
+/** Desktop navigation. Below 1024px the same links live in MobileNav. */
 export function MainNav({ className }: { className?: string }) {
   const t = useTranslations('nav');
   const label = useTranslations('header')('mainNavigation');
@@ -16,7 +16,7 @@ export function MainNav({ className }: { className?: string }) {
 
   return (
     <nav aria-label={label} className={className}>
-      <ul className="flex items-center gap-6">
+      <ul className="flex items-center gap-4 xl:gap-6">
         {MAIN_NAV.map((item) => (
           <li key={item.key}>
             <Link

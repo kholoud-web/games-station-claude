@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-const DESKTOP_QUERY = '(min-width: 768px)';
+const DESKTOP_QUERY = '(min-width: 1024px)';
 
 /**
  * The slide-over menu is hidden at desktop width, but a modal still traps focus and hides the page

@@ -10,7 +10,7 @@ import { CartButton } from './cart-button';
 import { LocaleSwitcher } from './locale-switcher';
 
 const iconButton = 'size-10 border-transparent bg-transparent';
-const desktopOnly = 'hidden md:inline-flex';
+const desktopOnly = 'hidden lg:inline-flex';
 
 /**
  * Wishlist, cart, account and language. Only the cart stays in the bar on small screens; the rest
@@ -21,7 +21,7 @@ export function HeaderActions() {
   const locale = useAppLocale();
 
   return (
-    <div className="ms-auto flex items-center gap-1 md:ms-0">
+    <div className="ms-auto flex items-center gap-1 lg:ms-0">
       <Button asChild variant="icon" className={`${iconButton} ${desktopOnly}`}>
         <Link href={localePath(locale, '/wishlist')} aria-label={t('wishlist')}>
           <Heart aria-hidden="true" className="size-5" />
