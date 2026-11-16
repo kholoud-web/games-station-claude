@@ -1,10 +1,12 @@
 import type { CategoryService } from '../category-service';
+import type { NewsletterService } from '../newsletter-service';
 import type { OrderService } from '../order-service';
 import type { PaymentService } from '../payment-service';
 import type { PricingService } from '../pricing-service';
 import type { ProductService } from '../product-service';
 import { createMockCategoryService } from './category-service';
 import type { MockConfig } from './config';
+import { createMockNewsletterService } from './newsletter-service';
 import { createMockOrderService } from './order-service';
 import { createMockPaymentService } from './payment-service';
 import { createMockPricingService } from './pricing-service';
@@ -16,6 +18,7 @@ export type Services = {
   pricing: PricingService;
   orders: OrderService;
   payments: PaymentService;
+  newsletter: NewsletterService;
 };
 
 export function createMockServices(config: MockConfig): Services {
@@ -25,5 +28,6 @@ export function createMockServices(config: MockConfig): Services {
     pricing: createMockPricingService(config),
     orders: createMockOrderService(config),
     payments: createMockPaymentService(config),
+    newsletter: createMockNewsletterService(config),
   };
 }

@@ -15,7 +15,9 @@
     "shop": "تسوّق",
     "categories": "الأقسام",
     "giftCards": "بطاقات الهدايا",
-    "support": "الدعم"
+    "support": "الدعم",
+    "deals": "العروض",
+    "about": "من نحن"
   },
   "a11y": {
     "skipToContent": "تخطَّ إلى المحتوى"
@@ -62,6 +64,64 @@
     },
     "breadcrumb": {
       "label": "مسار التنقل"
+    }
+  },
+  "header": {
+    "logoLabel": "الصفحة الرئيسية لـ Games Station",
+    "mainNavigation": "الرئيسي",
+    "menu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة",
+    "menuTitle": "القائمة",
+    "menuDescription": "تصفّح المتجر",
+    "searchLabel": "ابحث في المتجر",
+    "searchPlaceholder": "ابحث عن الأجهزة والألعاب والإكسسوارات...",
+    "wishlist": "المفضلة",
+    "account": "الحساب",
+    "cart": "السلة، {count, plural, =0 {فارغة} one {عنصر واحد} two {عنصران} few {{countText} عناصر} many {{countText} عنصرًا} other {{countText} عنصر}}"
+  },
+  "footer": {
+    "blurb": "أحدث معدات الألعاب، وملحقات الأجهزة الأصلية، والتسليم الفوري للألعاب الرقمية، مصمَّمة لأفضل أداء.",
+    "newsletterTitle": "اشترك في آخر المستجدات",
+    "emailLabel": "البريد الإلكتروني",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "join": "انضم",
+    "newsletterSuccess": "تم تسجيلك في القائمة.",
+    "newsletterSuccessDemo": "تم تسجيلك في القائمة. هذه نسخة تجريبية، لذلك لم يُحفظ أي شيء.",
+    "newsletterError": "تعذّر الاشتراك. حاول مرة أخرى.",
+    "paymentsLabel": "طرق الدفع",
+    "copyright": "© {year} Games Station. جميع الحقوق محفوظة.",
+    "categories": {
+      "title": "الأقسام",
+      "consoles": "أجهزة الألعاب",
+      "controllers": "وحدات التحكم والإدخال",
+      "vr": "الواقع الافتراضي والمحاكاة",
+      "digital": "الألعاب الرقمية",
+      "giftCards": "بطاقات الهدايا"
+    },
+    "support": {
+      "title": "الدعم والثقة",
+      "track": "تتبّع الطلبات",
+      "warranty": "سياسة الضمان",
+      "repairs": "إصلاح الأجهزة",
+      "returns": "الاسترجاع والاسترداد",
+      "diagnostics": "تشخيص الأجهزة"
+    },
+    "account": {
+      "title": "الحساب",
+      "dashboard": "لوحة العضو",
+      "orders": "سجل الطلبات",
+      "wishlist": "المفضلة المحفوظة",
+      "signIn": "تسجيل الدخول",
+      "createAccount": "إنشاء حساب"
+    }
+  },
+  "comingSoon": {
+    "message": "هذه الصفحة قادمة قريبًا.",
+    "backHome": "العودة إلى الرئيسية",
+    "pages": {
+      "warranty": "سياسة الضمان",
+      "repairs": "إصلاح الأجهزة",
+      "diagnostics": "تشخيص الأجهزة"
     }
   }
 }

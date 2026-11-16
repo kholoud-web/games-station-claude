@@ -15,7 +15,9 @@
     "shop": "Shop",
     "categories": "Categories",
     "giftCards": "Gift cards",
-    "support": "Support"
+    "support": "Support",
+    "deals": "Deals",
+    "about": "About"
   },
   "a11y": {
     "skipToContent": "Skip to content"
@@ -62,6 +64,64 @@
     },
     "breadcrumb": {
       "label": "Breadcrumb"
+    }
+  },
+  "header": {
+    "logoLabel": "Games Station home",
+    "mainNavigation": "Main",
+    "menu": "Open menu",
+    "closeMenu": "Close menu",
+    "menuTitle": "Menu",
+    "menuDescription": "Browse the store",
+    "searchLabel": "Search the store",
+    "searchPlaceholder": "Search hardware, games, accessories...",
+    "wishlist": "Wishlist",
+    "account": "Account",
+    "cart": "Cart, {count, plural, =0 {empty} one {{countText} item} other {{countText} items}}"
+  },
+  "footer": {
+    "blurb": "Next-generation gaming equipment, official console peripherals, and instant digital delivery engineered for ultimate performance.",
+    "newsletterTitle": "Subscribe to updates",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "Enter your email address",
+    "join": "Join",
+    "newsletterSuccess": "You're on the list.",
+    "newsletterSuccessDemo": "You're on the list. This is a demo, so nothing was saved.",
+    "newsletterError": "We couldn't subscribe you. Try again.",
+    "paymentsLabel": "Payment methods",
+    "copyright": "© {year} Games Station. All rights reserved.",
+    "categories": {
+      "title": "Categories",
+      "consoles": "Console systems",
+      "controllers": "Controllers & input",
+      "vr": "VR & simulation",
+      "digital": "Digital games",
+      "giftCards": "Gift cards"
+    },
+    "support": {
+      "title": "Support & trust",
+      "track": "Track orders",
+      "warranty": "Warranty policy",
+      "repairs": "Hardware repairs",
+      "returns": "Returns & refunds",
+      "diagnostics": "System diagnostics"
+    },
+    "account": {
+      "title": "Account",
+      "dashboard": "Member dashboard",
+      "orders": "Order history",
+      "wishlist": "Saved wishlist",
+      "signIn": "Sign in",
+      "createAccount": "Create account"
+    }
+  },
+  "comingSoon": {
+    "message": "This page is coming soon.",
+    "backHome": "Back to home",
+    "pages": {
+      "warranty": "Warranty policy",
+      "repairs": "Hardware repairs",
+      "diagnostics": "System diagnostics"
     }
   }
 }

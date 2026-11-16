@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { CartHydrator } from '@/components/providers/cart-hydrator';
 import { QueryProvider } from '@/components/providers/query-provider';
+import { Toaster } from '@/components/ui/toaster';
 import { getDirection } from '@/i18n/direction';
 import { routing } from '@/i18n/routing';
 import { getFontClass } from '@/lib/fonts';
@@ -30,7 +32,11 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
     <html lang={locale} dir={getDirection(locale)} className={`${await getFontClass(locale)} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <NextIntlClientProvider>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            {children}
+            <CartHydrator />
+            <Toaster />
+          </QueryProvider>
         </NextIntlClientProvider>
       </body>
     </html>
