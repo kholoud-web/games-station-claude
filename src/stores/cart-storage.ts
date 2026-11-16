@@ -1,5 +1,5 @@
 import type { PersistStorage, StorageValue } from 'zustand/middleware';
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 import type { CartItem } from '@/services/types';
 
 export const CART_STORAGE_KEY = 'gs-cart';

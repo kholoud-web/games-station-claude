@@ -1,17 +1,17 @@
+import { mockFailureRateSchema, mockLatencySchema } from '@/lib/env';
+
 export type MockConfig = { latencyMs: number; failureRate: number };
 
-const DEFAULTS: MockConfig = { latencyMs: 150, failureRate: 0 };
-
-function parse(value: string | undefined, fallback: number, min: number, max: number): number {
-  if (value === undefined || value.trim() === '') return fallback;
-  const n = Number(value);
-  return Number.isFinite(n) && n >= min && n <= max ? n : fallback;
-}
-
-/** Malformed or out-of-range values fall back to the defaults. */
+/**
+ * Tolerant runtime reader. next.config.ts already rejects malformed values at startup with the same
+ * schemas (`parseEnv`), so a bad value only reaches here from a test or a hand-built environment;
+ * each variable then falls back to its own default instead of crashing a page.
+ */
 export function readMockConfig(env: Record<string, string | undefined>): MockConfig {
+  const latency = mockLatencySchema.safeParse(env.NEXT_PUBLIC_MOCK_LATENCY_MS);
+  const failureRate = mockFailureRateSchema.safeParse(env.NEXT_PUBLIC_MOCK_FAILURE_RATE);
   return {
-    latencyMs: parse(env.NEXT_PUBLIC_MOCK_LATENCY_MS, DEFAULTS.latencyMs, 0, 10_000),
-    failureRate: parse(env.NEXT_PUBLIC_MOCK_FAILURE_RATE, DEFAULTS.failureRate, 0, 1),
+    latencyMs: latency.success ? latency.data : mockLatencySchema.parse(undefined),
+    failureRate: failureRate.success ? failureRate.data : mockFailureRateSchema.parse(undefined),
   };
 }
