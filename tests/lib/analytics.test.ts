@@ -143,3 +143,60 @@ describe('consoleAnalyticsAdapter', () => {
     expect(String(debug.mock.calls[0]?.[0])).toContain('product_viewed');
   });
 });
+
+describe('search queries never carry card numbers', () => {
+  function sentQuery(query: string) {
+    const sent = capture();
+    track({ name: 'search_performed', query, resultCount: 7 });
+    return sent;
+  }
+
+  it.each([
+    ['plain digits', '4111111111111111'],
+    ['spaced groups', '4111 1111 1111 1111'],
+    ['dashed groups', '4111-1111-1111-1111'],
+    ['a 13-digit number', '4222222222222'],
+    ['a 19-digit number', '6011000990139424123'],
+  ])('replaces %s with a placeholder and still records the search', (_label, query) => {
+    const sent = sentQuery(query);
+    expect(sent).toHaveLength(1);
+    expect(sent[0]).toMatchObject({ name: 'search_performed', query: '[redacted]', resultCount: 7 });
+  });
+
+  it('keeps the words around a card number', () => {
+    const sent = sentQuery('ps5 4111 1111 1111 1111 controller');
+    expect(sent[0]).toMatchObject({ query: 'ps5 [redacted] controller' });
+  });
+
+  it.each([
+    ['a number glued to a letter', 'x4111111111111111', 'x[redacted]'],
+    ['a run longer than 19 digits', '41111111111111112024', '[redacted]'],
+  ])('still redacts %s', (_label, query, expected) => {
+    expect(sentQuery(query)[0]).toMatchObject({ query: expected });
+  });
+
+  it('redacts every card-like number in one query', () => {
+    const sent = sentQuery('4111111111111111 or 5500-0000-0000-0004');
+    expect(sent[0]).toMatchObject({ query: '[redacted] or [redacted]' });
+  });
+
+  it.each(['dualsense', 'ps5 825', 'GS-CTRL-0042', '123456789012', '2024 2025', '4111 1111'])(
+    'leaves %s untouched',
+    (query) => {
+      expect(sentQuery(query)[0]).toMatchObject({ query });
+    },
+  );
+
+  it('does not change the object it was given', () => {
+    capture();
+    const input = { name: 'search_performed', query: '4111111111111111', resultCount: 1 } as const;
+    track(input);
+    expect(input.query).toBe('4111111111111111');
+  });
+
+  it('leaves other events alone', () => {
+    const sent = capture();
+    track({ name: 'product_viewed', productId: '4111111111111111' });
+    expect(sent[0]).toMatchObject({ productId: '4111111111111111' });
+  });
+});

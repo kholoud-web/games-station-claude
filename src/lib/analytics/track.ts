@@ -1,12 +1,17 @@
 import { newUuid } from '@/lib/uuid';
 import { EVENT_ORIGIN, type AnalyticsAdapter, type AnalyticsInput } from './events';
-import { findSensitiveKey } from './guard';
+import { findSensitiveKey, redactCardLikeNumbers } from './guard';
 
 let adapter: AnalyticsAdapter | null = null;
 
 /** Plug a provider in here later. With no adapter, tracking does nothing. */
 export function setAnalyticsAdapter(next: AnalyticsAdapter | null): void {
   adapter = next;
+}
+
+/** Search text is typed by people, so it is the one free-text field: card numbers are removed from it. */
+function scrubFreeText(input: AnalyticsInput): AnalyticsInput {
+  return input.name === 'search_performed' ? { ...input, query: redactCardLikeNumbers(input.query) } : input;
 }
 
 /**
@@ -25,7 +30,7 @@ export function track(input: AnalyticsInput): void {
     }
     const origin = EVENT_ORIGIN[input.name];
     adapter.send({
-      ...input,
+      ...scrubFreeText(input),
       eventId: newUuid(),
       timestamp: new Date().toISOString(),
       schemaVersion: 1,
