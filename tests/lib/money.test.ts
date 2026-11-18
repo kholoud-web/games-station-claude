@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { addMoney, formatMoney, money, multiplyMoney } from '@/lib/money';
+import type { Money } from '@/services/types';
 
 describe('money', () => {
   it('stores integer piasters in EGP', () => {
@@ -35,10 +36,33 @@ describe('formatMoney', () => {
     expect(formatMoney(money(999_999_999), 'en')).toContain('9,999,999.99');
   });
 
-  it('never prints NaN', () => {
-    for (const locale of ['en', 'ar'] as const) {
-      expect(formatMoney(money(12345), locale)).not.toContain('NaN');
-    }
+  it.each([0, 1, 99, 100, 12_345, 999_999_999, Number.MAX_SAFE_INTEGER])(
+    'prints a real two-decimal number for %s piasters in both languages',
+    (amount) => {
+      for (const locale of ['en', 'ar'] as const) {
+        const text = formatMoney(money(amount), locale);
+        expect(text).not.toMatch(/NaN|Infinity|undefined|null/);
+        expect(text).toMatch(/\d[\d,]*\.\d{2}/);
+      }
+    },
+  );
+});
+
+describe('formatMoney with a Money that did not come from money()', () => {
+  // A backend response or a cast can hand over any shape; the type alone proves nothing at runtime.
+  const raw = (amount: unknown, currency: unknown = 'EGP') => ({ amount, currency }) as Money;
+
+  it.each([Number.NaN, Number.POSITIVE_INFINITY, -1, 10.5, Number.MAX_SAFE_INTEGER + 1, '1999', null, undefined])(
+    'rejects an amount of %s instead of printing it',
+    (bad) => {
+      for (const locale of ['en', 'ar'] as const) {
+        expect(() => formatMoney(raw(bad), locale)).toThrow(RangeError);
+      }
+    },
+  );
+
+  it('rejects a currency other than EGP', () => {
+    expect(() => formatMoney(raw(1999, 'USD'), 'en')).toThrow(RangeError);
   });
 });
 

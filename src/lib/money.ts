@@ -29,7 +29,13 @@ const INTL_LOCALE: Record<Locale, string> = {
   ar: 'ar-EG-u-nu-latn',
 };
 
-/** Piasters become pounds only here, at display time. */
+/**
+ * Piasters become pounds only here, at display time. A Money can arrive from outside the type
+ * system (a backend response, a cast), so it is checked by the same rule as money(): a broken
+ * amount is rejected loudly instead of being printed as NaN or a wrong price.
+ */
 export function formatMoney(m: Money, locale: Locale): string {
+  assertPiasters(m.amount);
+  if (m.currency !== 'EGP') throw new RangeError(`Unsupported currency: ${String(m.currency)}`);
   return new Intl.NumberFormat(INTL_LOCALE[locale], { style: 'currency', currency: m.currency }).format(m.amount / 100);
 }
