@@ -109,6 +109,60 @@ describe('usePaymentAttempt', () => {
     expect(service.createAttempt).toHaveBeenCalledTimes(1);
   });
 
+  describe('when the order changes while the hook stays mounted', () => {
+    const render = (service: ReturnType<typeof fakeService>) =>
+      renderHook(({ orderRef }) => usePaymentAttempt(orderRef, options(service)), {
+        initialProps: { orderRef: 'o-1' },
+      });
+
+    it('starts the new order idle instead of showing the previous order outcome', async () => {
+      const service = fakeService(['SUCCEEDED']);
+      const { result, rerender } = render(service);
+      act(() => result.current.submit());
+      await waitFor(() => expect(result.current.state).toBe('SUCCEEDED'));
+      rerender({ orderRef: 'o-2' });
+      expect(result.current).toMatchObject({ state: 'idle', error: null, isSubmitting: false });
+    });
+
+    it('never replays the previous order idempotency key for the new order', async () => {
+      const service = fakeService(['SUCCEEDED']);
+      const { result, rerender } = render(service);
+      act(() => result.current.submit());
+      await waitFor(() => expect(result.current.state).toBe('SUCCEEDED'));
+      rerender({ orderRef: 'o-2' });
+      act(() => result.current.submit());
+      await waitFor(() => expect(service.createAttempt).toHaveBeenCalledTimes(2));
+      expect(service.createAttempt.mock.calls[1]?.[0].orderRef).toBe('o-2');
+      expect(keyOf(service, 1)).not.toBe(keyOf(service, 0));
+    });
+
+    it('does not let a poll still running for the old order write into the new one', async () => {
+      const service = fakeService();
+      let answer: (s: PaymentState) => void = () => {};
+      service.getStatus.mockImplementation(() => new Promise<PaymentState>((resolve) => (answer = resolve)));
+      const { result, rerender } = render(service);
+      act(() => result.current.submit());
+      await waitFor(() => expect(service.getStatus).toHaveBeenCalled());
+      rerender({ orderRef: 'o-2' });
+      await act(async () => answer('SUCCEEDED'));
+      expect(result.current.state).toBe('idle');
+    });
+
+    it('a finished run for the old order does not unlock a run still in flight for the new one', async () => {
+      const service = fakeService();
+      const releases: Array<(a: Attempt) => void> = [];
+      service.createAttempt.mockImplementation(() => new Promise<Attempt>((resolve) => releases.push(resolve)));
+      const { result, rerender } = render(service);
+      act(() => result.current.submit());
+      rerender({ orderRef: 'o-2' });
+      act(() => result.current.submit());
+      await waitFor(() => expect(releases).toHaveLength(2));
+      await act(async () => releases[0]?.({ attemptId: 'a-old', state: 'PROCESSING' }));
+      act(() => result.current.submit());
+      expect(service.createAttempt).toHaveBeenCalledTimes(2);
+    });
+  });
+
   it('ignores a stale status that would move the payment backwards', async () => {
     const service = fakeService();
     const seen: PaymentState[] = ['PROCESSING', 'PENDING', 'SUCCEEDED'];
