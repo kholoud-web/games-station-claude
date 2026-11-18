@@ -34,6 +34,21 @@ export function sanitizeItems(raw: unknown): CartItem[] {
   return items;
 }
 
+/**
+ * Combines the saved cart with lines already in memory (added before storage was read, or because
+ * storage is empty or blocked). Nothing is dropped. For the same line the larger quantity wins
+ * rather than the sum, so running this twice (React strict mode does) never inflates the cart.
+ */
+export function mergeLines(saved: CartItem[], inMemory: CartItem[]): CartItem[] {
+  const lines = new Map<string, CartItem>();
+  const keyOf = (l: CartItem) => `${l.productId}\u0000${l.variantId}`;
+  for (const line of [...saved, ...inMemory]) {
+    const existing = lines.get(keyOf(line));
+    lines.set(keyOf(line), existing ? { ...existing, quantity: Math.max(existing.quantity, line.quantity) } : line);
+  }
+  return [...lines.values()];
+}
+
 type CartPersisted = { items: CartItem[] };
 
 /**
@@ -67,3 +82,17 @@ export const safeCartStorage: PersistStorage<CartPersisted> = {
     }
   },
 };
+
+/**
+ * Storage that ignores writes until `canWrite()` says the saved cart has been read and merged.
+ * Without this, a change made before rehydrate would overwrite the saved cart with the in-memory
+ * one, and the lines saved in an earlier visit would be gone before they were ever read.
+ */
+export function createGatedCartStorage(canWrite: () => boolean): PersistStorage<CartPersisted> {
+  return {
+    ...safeCartStorage,
+    setItem(name, value) {
+      if (canWrite()) safeCartStorage.setItem(name, value);
+    },
+  };
+}

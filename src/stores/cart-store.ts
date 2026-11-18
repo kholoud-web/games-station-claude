@@ -1,12 +1,13 @@
-import { createStore, useStore } from 'zustand';
+import { createStore, type Mutate, type StoreApi, useStore } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { CartItem } from '@/services/types';
 import {
   CART_SCHEMA_VERSION,
   CART_STORAGE_KEY,
+  createGatedCartStorage,
   MAX_LINE_QUANTITY,
+  mergeLines,
   normalizeQuantity,
-  safeCartStorage,
   sanitizeItems,
 } from './cart-storage';
 
@@ -20,16 +21,20 @@ export type CartState = {
   clear: () => void;
 };
 
+type CartStore = Mutate<StoreApi<CartState>, [['zustand/persist', { items: CartItem[] }]]>;
+
 const sameLine = (a: CartItem, productId: string, variantId: string) =>
   a.productId === productId && a.variantId === variantId;
 
 /**
  * The cart holds ids and quantities only. Prices and totals always come from
  * the pricing service, so a stale or tampered price can never be displayed.
- * Storage is read only on `rehydrate()` so server and client render the same first paint.
+ * Storage is read only on `rehydrate()` so server and client render the same first paint, and it
+ * is written only after that read, so nothing done before it can overwrite the saved cart.
  */
 export function createCartStore() {
-  return createStore<CartState>()(
+  let hydrated = false;
+  const store: CartStore = createStore<CartState>()(
     persist(
       (set) => ({
         items: [],
@@ -60,17 +65,25 @@ export function createCartStore() {
       {
         name: CART_STORAGE_KEY,
         version: CART_SCHEMA_VERSION,
-        storage: safeCartStorage,
+        storage: createGatedCartStorage(() => hydrated),
         skipHydration: true,
+        onRehydrateStorage: () => (_state, error) => {
+          // A failed read keeps writes off: the saved cart is still unread and must not be replaced.
+          if (error) return;
+          hydrated = true;
+          // Save what the merge produced (for example lines added before the read).
+          store.setState((s) => ({ items: s.items }));
+        },
         partialize: (state) => ({ items: state.items }),
         migrate: (persisted) => ({ items: sanitizeItems((persisted as { items?: unknown } | null)?.items) }),
         merge: (persisted, current) => ({
           ...current,
-          items: sanitizeItems((persisted as { items?: unknown } | null)?.items),
+          items: mergeLines(sanitizeItems((persisted as { items?: unknown } | null)?.items), current.items),
         }),
       },
     ),
   );
+  return store;
 }
 
 export const cartStore = createCartStore();

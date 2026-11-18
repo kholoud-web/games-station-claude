@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CART_STORAGE_KEY, createCartStore, selectCount } from '@/stores/cart-store';
 
 const A = { productId: 'p-1', variantId: 'v-1' };
@@ -76,8 +76,9 @@ describe('cart store lines', () => {
 });
 
 describe('cart store persistence', () => {
-  it('writes only ids and quantities, with schema version 1', () => {
+  it('writes only ids and quantities, with schema version 1 (once the saved cart has been read)', async () => {
     const store = createCartStore();
+    await store.persist.rehydrate();
     store.getState().add({ ...A, quantity: 2 });
     expect(JSON.parse(localStorage.getItem(CART_STORAGE_KEY) ?? 'null')).toEqual({
       state: { items: [{ ...A, quantity: 2 }] },
@@ -150,5 +151,82 @@ describe('cart store with corrupted storage', () => {
     expect(() => store.getState().add({ ...A, quantity: 1 })).not.toThrow();
     expect(store.getState().items).toHaveLength(1);
     vi.restoreAllMocks();
+  });
+});
+
+describe('cart store rehydration keeps what is already in memory', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  const saved = (items: object[]) =>
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({ state: { items }, version: 1 }));
+
+  it('does not wipe an item added before rehydrate when storage is empty', async () => {
+    const store = createCartStore();
+    store.getState().add({ ...A, quantity: 2 });
+    localStorage.clear();
+    await store.persist.rehydrate();
+    expect(store.getState().items).toEqual([{ ...A, quantity: 2 }]);
+  });
+
+  it('does not wipe the cart when storage is blocked (private mode) and rehydrate runs', async () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    const store = createCartStore();
+    store.getState().add({ ...A, quantity: 1 });
+    await store.persist.rehydrate();
+    expect(store.getState().items).toEqual([{ ...A, quantity: 1 }]);
+  });
+
+  it('keeps both the saved lines and a line added before rehydrate', async () => {
+    saved([{ ...A, quantity: 2 }]);
+    const store = createCartStore();
+    store.getState().add({ ...B, quantity: 1 });
+    await store.persist.rehydrate();
+    expect(store.getState().items).toEqual(expect.arrayContaining([{ ...A, quantity: 2 }, { ...B, quantity: 1 }]));
+    expect(store.getState().items).toHaveLength(2);
+  });
+
+  it('does not write storage before it has been read, so a saved cart is never overwritten', () => {
+    saved([{ ...A, quantity: 2 }]);
+    const store = createCartStore();
+    store.getState().add({ ...B, quantity: 1 });
+    const stored = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) ?? '{}');
+    expect(stored.state.items).toEqual([{ ...A, quantity: 2 }]);
+  });
+
+  it('writes the merged cart to storage once rehydrated', async () => {
+    saved([{ ...A, quantity: 2 }]);
+    const store = createCartStore();
+    store.getState().add({ ...B, quantity: 1 });
+    await store.persist.rehydrate();
+    const stored = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) ?? '{}');
+    expect(stored.state.items).toHaveLength(2);
+    expect(stored.version).toBe(1);
+  });
+
+  it('keeps writes off when reading the saved cart failed, so the unread cart is not replaced', async () => {
+    saved([{ ...A, quantity: 2 }]);
+    const store = createCartStore();
+    store.persist.setOptions({
+      merge: () => {
+        throw new Error('cannot merge');
+      },
+    });
+    await store.persist.rehydrate();
+    store.getState().add({ ...B, quantity: 1 });
+    const stored = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) ?? '{}');
+    expect(stored.state.items).toEqual([{ ...A, quantity: 2 }]);
+  });
+
+  it('is safe to run twice (React strict mode runs effects twice in development)', async () => {
+    saved([{ ...A, quantity: 2 }]);
+    const store = createCartStore();
+    await store.persist.rehydrate();
+    await store.persist.rehydrate();
+    expect(store.getState().items).toEqual([{ ...A, quantity: 2 }]);
   });
 });
