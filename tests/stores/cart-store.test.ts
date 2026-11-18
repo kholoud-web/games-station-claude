@@ -140,6 +140,28 @@ describe('cart store with corrupted storage', () => {
     expect(store.getState().items).toEqual([{ ...A, quantity: 2 }]);
   });
 
+  // The line parser is hand-written (Zod is too heavy for every page); these pin what it accepts.
+  const lineCases: Array<[string, unknown, ReturnType<() => object | null>]> = [
+    ['an empty variantId', { ...A, variantId: '', quantity: 1 }, null],
+    ['a missing variantId', { productId: 'p-1', quantity: 1 }, null],
+    ['a null entry', null, null],
+    ['an array entry', [A], null],
+    ['a null quantity', { ...A, quantity: null }, null],
+    ['a zero quantity', { ...A, quantity: 0 }, null],
+    ['a negative quantity', { ...A, quantity: -3 }, null],
+    ['a numeric productId', { productId: 7, variantId: 'v-1', quantity: 1 }, null],
+    ['a fractional quantity (whole units kept)', { ...A, quantity: 2.9 }, { ...A, quantity: 2 }],
+    ['an oversized quantity (clamped to 99)', { ...A, quantity: 500 }, { ...A, quantity: 99 }],
+    ['extra fields (only the three known ones survive)', { ...A, quantity: 1, price: 1, note: 'x' }, { ...A, quantity: 1 }],
+  ];
+
+  it.each(lineCases)('a saved line with %s', async (_label, line, expected) => {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({ state: { items: [line] }, version: 1 }));
+    const store = createCartStore();
+    await store.persist.rehydrate();
+    expect(store.getState().items).toEqual(expected ? [expected] : []);
+  });
+
   it('still works when storage throws on every access (private mode)', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
       throw new Error('blocked');

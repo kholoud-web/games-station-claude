@@ -1,3 +1,4 @@
+import { MOCK_FAILURE_RATE, MOCK_LATENCY, type NumberRule } from './mock-env';
 import { z } from './zod';
 
 // This file is imported by next.config.ts, which cannot use the `@/` alias: keep its imports relative.
@@ -6,13 +7,13 @@ import { z } from './zod';
 const blankIsUnset = (value: unknown) =>
   typeof value === 'string' && value.trim() === '' ? undefined : value;
 
-function numberVariable(min: number, max: number, fallback: number) {
+function numberVariable({ min, max, fallback }: NumberRule) {
   return z.preprocess(blankIsUnset, z.coerce.number().min(min).max(max).default(fallback));
 }
 
-/** One schema per variable, shared by the strict startup check and the tolerant runtime reader. */
-export const mockLatencySchema = numberVariable(0, 10_000, 150);
-export const mockFailureRateSchema = numberVariable(0, 1, 0);
+/** Strict startup check. The ranges come from mock-env.ts, which the browser-side reader also uses. */
+export const mockLatencySchema = numberVariable(MOCK_LATENCY);
+export const mockFailureRateSchema = numberVariable(MOCK_FAILURE_RATE);
 
 const envSchema = z.object({
   NEXT_PUBLIC_MOCK_LATENCY_MS: mockLatencySchema,

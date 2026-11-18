@@ -1,17 +1,19 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
 import { useId, useRef, useState, type FormEvent } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { newsletterSchema } from '@/lib/validation/schemas';
+import { lazyZodResolver } from '@/lib/validation/lazy-resolver';
 import type { NewsletterService } from '@/services/newsletter-service';
 
 type Subscribe = NewsletterService['subscribe'];
 type Values = { email: string };
+
+/** Zod loads on the first submit, not with the page: the footer is on every route. */
+const resolver = lazyZodResolver<Values>(async () => (await import('@/lib/validation/schemas')).newsletterSchema);
 type Outcome = { kind: 'success'; simulated: boolean } | { kind: 'error' } | null;
 
 /**
@@ -33,7 +35,7 @@ export function NewsletterForm({ subscribe = defaultSubscribe }: { subscribe?: S
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<Values>({ resolver: zodResolver(newsletterSchema), defaultValues: { email: '' } });
+  } = useForm<Values>({ resolver, defaultValues: { email: '' } });
 
   const submit = handleSubmit(async ({ email }) => {
     setOutcome(null);

@@ -1,17 +1,9 @@
 import type { PersistStorage, StorageValue } from 'zustand/middleware';
-import { z } from '@/lib/zod';
 import type { CartItem } from '@/services/types';
 
 export const CART_STORAGE_KEY = 'gs-cart';
 export const CART_SCHEMA_VERSION = 1;
 export const MAX_LINE_QUANTITY = 99;
-
-/** Strips unknown keys (such as a planted `price`) because zod objects drop them by default. */
-const lineSchema = z.object({
-  productId: z.string().min(1),
-  variantId: z.string().min(1),
-  quantity: z.number(),
-});
 
 /** Whole units between 1 and 99, or null when the value cannot be a quantity. */
 export function normalizeQuantity(value: number): number | null {
@@ -21,17 +13,25 @@ export function normalizeQuantity(value: number): number | null {
   return Math.min(whole, MAX_LINE_QUANTITY);
 }
 
+/**
+ * One saved line, or null when it is not a valid line. Only the three known fields are copied out,
+ * so anything planted next to them (a `price`, say) never reaches the cart. Written by hand rather
+ * than with Zod: this runs on every page, and Zod is about 90 KB gzip.
+ */
+function parseLine(entry: unknown): CartItem | null {
+  if (typeof entry !== 'object' || entry === null) return null;
+  const { productId, variantId, quantity } = entry as Record<string, unknown>;
+  if (typeof productId !== 'string' || productId === '') return null;
+  if (typeof variantId !== 'string' || variantId === '') return null;
+  if (typeof quantity !== 'number') return null;
+  const whole = normalizeQuantity(quantity);
+  return whole === null ? null : { productId, variantId, quantity: whole };
+}
+
 /** Keeps the valid lines of whatever was found in storage and drops everything else. */
 export function sanitizeItems(raw: unknown): CartItem[] {
   if (!Array.isArray(raw)) return [];
-  const items: CartItem[] = [];
-  for (const entry of raw) {
-    const parsed = lineSchema.safeParse(entry);
-    if (!parsed.success) continue;
-    const quantity = normalizeQuantity(parsed.data.quantity);
-    if (quantity !== null) items.push({ ...parsed.data, quantity });
-  }
-  return items;
+  return raw.flatMap((entry) => parseLine(entry) ?? []);
 }
 
 /**

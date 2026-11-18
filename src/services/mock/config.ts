@@ -1,17 +1,17 @@
-import { mockFailureRateSchema, mockLatencySchema } from '@/lib/env';
+import { MOCK_FAILURE_RATE, MOCK_LATENCY, parseBoundedNumber } from '@/lib/mock-env';
 
 export type MockConfig = { latencyMs: number; failureRate: number };
 
 /**
- * Tolerant runtime reader. next.config.ts already rejects malformed values at startup with the same
- * schemas (`parseEnv`), so a bad value only reaches here from a test or a hand-built environment;
- * each variable then falls back to its own default instead of crashing a page.
+ * Tolerant runtime reader. next.config.ts already rejects malformed values at startup with the
+ * strict schemas in lib/env.ts (`parseEnv`), so a bad value only reaches here from a test or a
+ * hand-built environment; each variable then falls back to its own default instead of crashing a
+ * page. This file must stay free of Zod: it runs in the browser (see tests/lib/client-bundle.test.ts).
  */
 export function readMockConfig(env: Record<string, string | undefined>): MockConfig {
-  const latency = mockLatencySchema.safeParse(env.NEXT_PUBLIC_MOCK_LATENCY_MS);
-  const failureRate = mockFailureRateSchema.safeParse(env.NEXT_PUBLIC_MOCK_FAILURE_RATE);
   return {
-    latencyMs: latency.success ? latency.data : mockLatencySchema.parse(undefined),
-    failureRate: failureRate.success ? failureRate.data : mockFailureRateSchema.parse(undefined),
+    latencyMs: parseBoundedNumber(env.NEXT_PUBLIC_MOCK_LATENCY_MS, MOCK_LATENCY) ?? MOCK_LATENCY.fallback,
+    failureRate:
+      parseBoundedNumber(env.NEXT_PUBLIC_MOCK_FAILURE_RATE, MOCK_FAILURE_RATE) ?? MOCK_FAILURE_RATE.fallback,
   };
 }
