@@ -33,6 +33,8 @@ Frontend-only phase. This documents the controls that exist in the code and the 
 5. **No dependency audit** (`pnpm audit`) and **no secret scan** have been run for this report.
 6. **Zod runs in `jitless` mode** to avoid `new Function`; slower only for very large objects.
 7. **Frontend route protection is not security.** Admin and account routes do not exist yet; when they do, authorization must be enforced by the backend on every request.
+8. **Analytics scrubs card-like numbers from search text.** `track()` replaces any run of 13 or more digits, or 13 to 19 digits split by single spaces or dashes, in `search_performed.query` with `[redacted]` (no Luhn check, so a mistyped number is also removed; a long numeric search such as a barcode is lost). Other events hold ids and counts only, and fields named like secrets are still dropped.
+9. **`formatMoney` throws on an invalid `Money`** (non-integer, negative, non-finite, wrong currency) instead of printing a price. A bad backend value must be rejected at the service boundary with a schema in Phase 3, because a throw during render reaches the nearest error boundary.
 
 ## What only a backend can do (not built)
 

@@ -6,7 +6,7 @@ Date: 2026-11-17. Spec: `docs/superpowers/specs/2026-11-08-foundation-design.md`
 
 ## Files created and modified
 
-- 124 source files under `src/` and 46 test files under `tests/`, added across the commits since the scaffold (about 14,500 lines in total, including docs).
+- 126 source files under `src/` and 45 test files under `tests/`, added across the commits since the scaffold (about 14,500 lines in total, including docs).
 - 10 documents: `README.md` and `docs/{requirements,architecture,frontend-architecture,api-contracts,security,performance,testing,data-engineering,deployment}.md`, plus this report.
 - Modified from the scaffold: default Next.js boilerplate and the five sample SVGs in `public/` were removed.
 - Dependencies: 20 runtime, 19 dev. Added only when a task needed them (the shadcn CLI and Google Fonts were unreachable from the sandbox, so components are hand-written in shadcn style on Radix and fonts are self-hosted).
@@ -33,7 +33,7 @@ Date: 2026-11-17. Spec: `docs/superpowers/specs/2026-11-08-foundation-design.md`
 | `pnpm lint` | Passed |
 | `pnpm check:rtl` | Passed, 119 files, no physical-direction utilities |
 | `pnpm check:contrast` | 31 pairs, 0 required failures, 4 advisory shortfalls (see issues) |
-| `pnpm test` | 43 files, 393 tests passed |
+| `pnpm test` | 45 files, 458 tests passed |
 | `pnpm build` | Passed, 13 static pages |
 | Horizontal overflow in Chromium | None at 375, 768 and 1280px, English and Arabic (and at 11 widths from 320 to 1440px earlier in Task 16) |
 | Production server | `/en` and `/ar` return 200, `/en/fr` returns 404, `/en/dev/components` returns 404, six security headers present |
@@ -52,9 +52,22 @@ Mutation checks were also run for most tasks (see the ledger): deliberate breaka
 - **Browsers other than Chromium,** real devices, real screen readers, real mobile networks.
 - **Deployment, CDN behavior, load or payment capacity:** not tested at all.
 
+## Final review and fixes
+
+One fresh-context reviewer read the whole branch and ran the suite, the build and headless-Chrome probes. It reported no Critical findings. It ran on Sonnet 5.5, not the most capable model the process asks for, so treat it as a good review, not the strongest one. Six Important findings were fixed, each with a test that failed first:
+
+1. Payment polling ignored forward and terminal states reported by the server.
+2. The idempotency key and attempt state were not scoped to the order.
+3. Restoring the cart could wipe the in-memory cart, and could overwrite the saved cart before reading it.
+4. `formatMoney` accepted an invalid `Money`, and its never-NaN test could not fail.
+5. Zod was in the shared client bundle (see issue 1 below).
+6. A card number pasted into search could reach analytics in `search_performed.query`.
+
+Ten minor findings were deferred and one Important finding was not changed (field border contrast, issue 2 below). The fixes were verified by the automated suite and a production build only; Lighthouse and the browser probes were not repeated after them.
+
 ## Performance and accessibility issues
 
-1. **Zod ships to every page** as the largest client chunk (about 380 KB raw, 90 KB gzipped); Lighthouse estimates 98 KiB unused JavaScript. Not fixed. Options are in `docs/performance.md` finding 0.
+1. **Zod no longer ships to every page.** After the final review it was moved out of the shared client code: cart lines are validated by hand, the newsletter form loads Zod on its first submit, and the mock config reader has its own dependency-free module. Verified by grepping the built chunks that `/en` and `/ar` reference (none contains Zod) and pinned by `tests/lib/client-bundle.test.ts`. Lighthouse was not re-run after this change, so the score and the bundle sizes are not re-measured.
 2. **Default input border `#1D3550` is 1.2 to 1.56:1** against the surfaces, under the 3:1 that WCAG 1.4.11 asks for on control boundaries. It follows `design.md`; inputs get a cyan border and ring on focus. A decision on the border token is needed from the design owner.
 3. **Header collapses at 1024px, not 768px.** The spec says the nav collapses below 768px, but the full header needs about 1,290px, so at 768px the language switcher fell off screen. Tablets now get the compact header (ledger ruling).
 4. **Checkbox is 24px, not Figma's 16px,** to meet the WCAG 2.2 AA target size.
@@ -62,7 +75,7 @@ Mutation checks were also run for most tasks (see the ledger): deliberate breaka
 
 ## Remaining bugs and risks
 
-- Two files are over the 100-line guideline: `use-payment-attempt.ts` (120, kept whole on purpose because its lock, key and attempt share one invariant) and `newsletter-form.tsx` (106). Two more are data or types (`services/types/index.ts` 134, `mocks/products.ts` 126).
+- Two files are over the 100-line guideline: `use-payment-attempt.ts` (154, kept whole on purpose because its lock, key and attempt share one invariant) and `newsletter-form.tsx` (108). Two more are data or types (`services/types/index.ts` 134, `mocks/products.ts` 126).
 - The CSP allows `'unsafe-inline'` for scripts and styles in production, a weaker XSS backstop than a nonce policy. A nonce policy would force dynamic rendering and give up CDN caching of static pages.
 - The wishlist heart is local to each card and resets on reload.
 - A `Strict-Transport-Security` header is sent in production; it is sticky, so the real domain must serve HTTPS before launch.

@@ -21,7 +21,7 @@ Envelope on every event: `eventId` (UUID), `timestamp` (ISO 8601), `schemaVersio
 | Event | Origin | Emitted today |
 | --- | --- | --- |
 | `product_viewed` | browser | Contract only; product page not built |
-| `search_performed` | browser | Contract only; search page not built (`normalizeSearchQuery` is ready) |
+| `search_performed` | browser | Contract only; search page not built. `track()` replaces card-like numbers in `query` with `[redacted]` before the event reaches a provider |
 | `add_to_cart` | browser | Yes, from the product card |
 | `checkout_started` | browser | Contract only; checkout not built |
 | `order_created` | backend | Contract only |

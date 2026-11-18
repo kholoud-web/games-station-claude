@@ -4,7 +4,7 @@
 
 | Command | Checks |
 | --- | --- |
-| `pnpm test` | Vitest, jsdom, Testing Library (43 files, 393 tests at the last run) |
+| `pnpm test` | Vitest, jsdom, Testing Library (45 files, 458 tests at the last run) |
 | `pnpm typecheck` | `next typegen` then `tsc --noEmit` with `strict` and `noUncheckedIndexedAccess` |
 | `pnpm lint` | ESLint with `jsx-a11y` |
 | `pnpm check:rtl` | No physical direction utilities (`ml-`, `pr-`, `left-`, `text-left`, border and rounding sides) in `src/` |
