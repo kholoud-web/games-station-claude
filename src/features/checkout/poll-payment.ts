@@ -1,6 +1,6 @@
 import type { PaymentService } from '@/services/payment-service';
 import type { PaymentState } from '@/services/types';
-import { canTransition, isTerminal } from './payment-machine';
+import { isForwardMove, isTerminal } from './payment-machine';
 
 type PollInput = {
   service: PaymentService;
@@ -15,8 +15,9 @@ type PollInput = {
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 /**
- * Asks the server for the payment status until it settles. A status that would move the
- * payment backwards is stale and ignored; a failed check counts as a poll and is retried.
+ * Asks the server for the payment status until it settles. The server is the authority, so any
+ * status further along than ours is accepted even if it skips steps; one that is not (stale) is
+ * ignored. A failed check counts as a poll and is retried.
  * Returns timedOut when the outcome is still unknown, so the UI can show a pending state.
  */
 export async function pollPayment(input: PollInput): Promise<{ state: PaymentState; timedOut: boolean }> {
@@ -26,7 +27,7 @@ export async function pollPayment(input: PollInput): Promise<{ state: PaymentSta
     try {
       const next = await input.service.getStatus(input.attemptId);
       if (input.isCancelled()) return { state: current, timedOut: false };
-      if (next !== current && canTransition(current, next)) {
+      if (isForwardMove(current, next)) {
         current = next;
         input.onState(current);
       }

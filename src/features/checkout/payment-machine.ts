@@ -28,6 +28,27 @@ export function transition(from: PaymentState, to: PaymentState): PaymentState {
   return to;
 }
 
+/** How far along the payment lifecycle a state is. Settled outcomes share one stage. */
+const stage: Record<PaymentState, number> = {
+  PENDING: 0,
+  PROCESSING: 1,
+  SUCCEEDED: 2,
+  FAILED: 2,
+  CANCELLED: 2,
+  EXPIRED: 2,
+  REFUND_PENDING: 3,
+  REFUNDED: 4,
+};
+
+/**
+ * Whether a status reported by the server is news. The server is the authority, so it may skip
+ * steps the client never saw (PENDING straight to SUCCEEDED, PROCESSING to EXPIRED); only a status
+ * that is not further along than what we already show is stale and ignored.
+ */
+export function isForwardMove(from: PaymentState, to: PaymentState): boolean {
+  return stage[to] > stage[from];
+}
+
 /** A terminal payment never changes again; the customer has to start a new attempt. */
 export function isTerminal(state: PaymentState): boolean {
   return allowedTransitions[state].length === 0;
