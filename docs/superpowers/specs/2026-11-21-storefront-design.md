@@ -28,7 +28,7 @@ Extends the Foundation types; existing fields stay.
 - `Category` set is a taxonomy decision (section 11, item 1).
 - `Product` gains: `attributes` (for example `connectivity`), `badges` (for example "Pro pick"), grouped `specs`, `options` groups (finish, caps preset) with per-option stock, `pairedProductIds`, `warranty` details, and `videos`.
 - `protection` (already present) stays as the warranty or official-hardware badge. Video protection is separate (section 6).
-- `ProductFilters` gains: `colors`, `connectivity`, `minRating`, `page` (1-based) and `inStockOnly` is the availability filter. `ProductSort` gains `name`. The cursor stays for later infinite scroll; the numbered Figma pagination uses `page` plus `limit`, and the response keeps `total`.
+- `ProductFilters` gains `colors`, `connectivity`, `minRating` and `page` (1-based); the existing `inStockOnly` is the availability filter. `ProductSort` gains `name`. The cursor stays for later infinite scroll; the numbered Figma pagination uses `page` plus `limit`, and the response keeps `total`.
 - `ProductService` gains `facets(filters): Promise<Facets>` (counts per option for the sidebar), `pairedWith(productId)` and `related(productId)`. `list` and `getBySlug` accept an `AbortSignal` so obsolete requests can be cancelled.
 - New `VideoService.getPlayback(productId, videoId)` returns `{ url, expiresAt, watermark }` (simulated signed, expiring access).
 - Mock catalog: about 36 bilingual products across the categories, with brands, ratings, options, stock states, specs, reviews and pairs. Placeholder art stays SVG under `public/products/`, one per category, behind a `ProductImage` component with a fixed aspect-ratio box. Real photos later need only a `src` change.
