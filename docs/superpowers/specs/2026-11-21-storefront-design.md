@@ -25,7 +25,7 @@ Build the public storefront on top of the Foundation: the home page, the product
 
 Extends the Foundation types; existing fields stay.
 
-- `Category` set is a taxonomy decision (section 11, item 1).
+- Categories stay the five already in the mock data and the footer: Console Systems, Controllers & Input, VR & Simulation, Digital Games, Gift Cards (user decision, section 11). Figma's headset, keyboard, mouse and dock products live under Controllers & Input and are told apart by a product `kind` attribute (used for the placeholder art), not by category. Gift Cards products appear in the catalog; the gift card purchase and redemption flow is a later sub-project.
 - `Product` gains: `attributes` (for example `connectivity`), `badges` (for example "Pro pick"), grouped `specs`, `options` groups (finish, caps preset) with per-option stock, `pairedProductIds`, `warranty` details, and `videos`.
 - `protection` (already present) stays as the warranty or official-hardware badge. Video protection is separate (section 6).
 - `ProductFilters` gains `colors`, `connectivity`, `minRating` and `page` (1-based); the existing `inStockOnly` is the availability filter. `ProductSort` gains `name`. The cursor stays for later infinite scroll; the numbered Figma pagination uses `page` plus `limit`, and the response keeps `total`.
@@ -65,7 +65,7 @@ The Master Prompt asks for authorized hosting, signed URLs or tokens, expiring a
 
 ## 7. Home page
 
-Built from the flattened image, so spacing is approximate: hero carousel (PS5 slide copy as in Figma, controls, pause button, no autoplay under reduced motion), trust strip (free shipping uses the mock threshold constant, EGP 2,500, not Figma's "$50"), category tiles, and the "Save up to 40%" promo banner. Slide and promo copy are mock content, clearly separated from components.
+Built from the flattened image, so spacing is approximate: hero carousel (PS5 slide copy as in Figma, controls, pause button, no autoplay under reduced motion), trust strip (free shipping uses the mock threshold constant, EGP 2,500, not Figma's "$50"), five category tiles (the five categories above, not Figma's headset, keyboard and mouse tiles), and the "Save up to 40%" promo banner. The catalog's Category filter group lists the same five. Slide and promo copy are mock content, clearly separated from components.
 
 ## 8. Components
 
@@ -94,6 +94,6 @@ Each item must be run and its result reported.
 
 ## 11. Open decisions (defaults used unless you change them)
 
-1. **Category taxonomy.** Figma shows three different lists: home tiles (Consoles, Gaming Headsets, Keyboards, Gaming Mice, Accessories), catalog filter (Consoles, Controllers, Keyboards, Mice, Accessories) and footer (Console Systems, Controllers & Input, VR & Simulation, Digital Games, Gift Cards). Default: Consoles, Controllers, Headsets, Keyboards, Mice, Accessories (the storefront screens), with the footer links updated to match. Gift Cards stays a separate footer link to its own page later.
+1. **Category taxonomy (decided by the user).** Figma shows three different lists: home tiles (Consoles, Gaming Headsets, Keyboards, Gaming Mice, Accessories), catalog filter (Consoles, Controllers, Keyboards, Mice, Accessories) and footer (Console Systems, Controllers & Input, VR & Simulation, Digital Games, Gift Cards). The footer list is used everywhere. Cost: the home tiles and catalog filter differ from Figma's wording, and peripherals such as headsets share one category.
 2. Bundles, upsell rules, installments and the real shipping and return windows are Phase 3 business questions and are not built here.
 3. The exact home layout cannot be measured from the flattened image; the Figma frames for home are not available as editable design.
